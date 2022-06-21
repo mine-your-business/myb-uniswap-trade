@@ -1,0 +1,8 @@
+{
+  "UniswapTradeFn": {
+    "RUN_MODE": "test",
+    "WALLET_ADDRESS": "",
+    "WALLET_ADDRESS_PRIVATE_KEY": "",
+    "WITHDRAWAL_WALLET_ADDRESS": ""
+  }
+}

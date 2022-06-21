@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  myb-uniswap-trade
+
+  Serverless capabilities for managing aspects of a mining business
+
+Resources:
+  # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+  UniswapTradeFn:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: uniswap_trade_function
+      Handler: uniswap_trade.app.lambda_handler
+      Runtime: python3.8
+      Timeout: 30
+      Environment:
+        Variables:
+          RUN_MODE: production
+          UNISWAP_VERSION: 3
+          # This is used by the library and doesn't need to be in Configuration
+          NETWORK_PROVIDER: https://polygon-rpc.com/
+          TRADES_CURRENCY_SYMBOL: WETH
+          TRADES_CURRENCY_CONTRACT: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'
+          TRADES_TARGET_CURRENCY_SYMBOL: USDC
+          TRADES_TARGET_CURRENCY_CONTRACT: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174'
+          WALLET_ADDRESS: '{{resolve:ssm:/defi/wallets/meta/address:1}}'
+          WALLET_PRIVATE_KEY: '{{resolve:ssm:/defi/wallets/meta/private_key:1}}'
+          WITHDRAWAL_WALLET_ADDRESS: '{{resolve:ssm:/defi/wallets/cdc/address:1}}'
+      Events:
+        CWSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: cron(30 0 * * ? *)
+            Name: UniswapTradeSchedule
+            Description: execution schedule for exchanging crypto on Uniswap
+            Enabled: true
