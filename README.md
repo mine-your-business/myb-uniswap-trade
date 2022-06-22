@@ -59,6 +59,26 @@ aws ssm put-parameter \
     --value "0x1234abcd"
 ```
 
+## Google Sheets
+
+This project leverages Google Sheets for maintaining a history of the daily trades being performed.
+
+The current column settings assume you have a sheet that looks like this (the names don't need to match, only the number of columns) for the trades (`Timestamp,Exchange,Network,Input Token,Output Token,Swap Price,LP Price Impact,Input Amount,Output Amount,Transaction ID,Tx Link`):
+
+![Trades Sheet](images/trades_spreadsheet.png)
+
+Sheets API documentation (Python) can be found [here](https://developers.google.com/sheets/api/quickstart/python). That includes instructions on getting credentials for accessing Sheets.
+
+A spreadsheet's ID and individual sheet ID (within a spreadsheet) can be found following the instructions [here](https://developers.google.com/sheets/api/guides/concepts). (Hint: it's in the URL! `https://docs.google.com/spreadsheets/d/spreadsheetId/edit#gid=sheetId`)
+
+In order to use an API Key to programmatically access a spreadsheet using a "service account", you will need to complete the following steps:
+1. Create a [Google Cloud Platform (GCP) project](https://cloud.google.com/resource-manager/docs/creating-managing-projects)
+1. [Enable the Google Sheets API](https://support.google.com/googleapi/answer/6158841?hl=en)
+1. [Create a service account](https://cloud.google.com/iam/docs/creating-managing-service-accounts)
+1. [Create an API Key for your Service Account](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) - Choosing the JSON option as the final step will give you a JSON file with key data to use
+1. [Share](https://support.google.com/docs/answer/2494822?co=GENIE.Platform%3DDesktop&hl=en) the spreadsheet with that service account's email
+
+
 ## Deploy the application
 
 Note that this project already comes with a [`samconfig.toml`](samconfig.toml) file for ease of use. With that file, you can build and deploy with the following:

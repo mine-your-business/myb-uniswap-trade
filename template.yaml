@@ -13,13 +13,16 @@ Resources:
       CodeUri: uniswap_trade_function
       Handler: uniswap_trade.app.lambda_handler
       Runtime: python3.8
-      Timeout: 30
+      Timeout: 60
       Environment:
         Variables:
           RUN_MODE: production
           UNISWAP_VERSION: 3
           # This is used by the library and doesn't need to be in Configuration
+          NETWORK: polygon
+          EXCHANGE: uniswap
           NETWORK_PROVIDER: https://polygon-rpc.com/
+          NETWORK_TRANSACTIONS_EXPLORER_PREFIX: https://polygonscan.com/tx/
           TRADES_CURRENCY_SYMBOL: WETH
           TRADES_CURRENCY_CONTRACT: '0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619'
           TRADES_TARGET_CURRENCY_SYMBOL: USDC
@@ -27,6 +30,23 @@ Resources:
           WALLET_ADDRESS: '{{resolve:ssm:/defi/wallets/meta/address:1}}'
           WALLET_PRIVATE_KEY: '{{resolve:ssm:/defi/wallets/meta/private_key:1}}'
           WITHDRAWAL_WALLET_ADDRESS: '{{resolve:ssm:/defi/wallets/cdc/address:1}}'
+          # Set this to false, and none of the variables below are necessary
+          RECORD_TRADES: true
+          SHEETS_TRADES_SPREADSHEET_ID: '{{resolve:ssm:/google/sheets/spreadsheets/mine_your_business/polygon_trades/id:1}}' 
+          SHEETS_TRADES_SPREADSHEET_SHEET_ID: '{{resolve:ssm:/google/sheets/spreadsheets/mine_your_business/polygon_trades/sheet_id:1}}' 
+          SHEETS_TRADES_SPREADSHEET_DATA_START_COLUMN: 0
+          SHEETS_TRADES_SPREADSHEET_DATA_EXCLUSIVE_END_COLUMN: 11
+          SHEETS_CREDENTIALS_TYPE: '{{resolve:ssm:/google/sheets/credentials/mine_your_business/type:1}}' 
+          SHEETS_CREDENTIALS_PROJECT_ID: '{{resolve:ssm:/google/sheets/credentials/mine_your_business/project_id:1}}' 
+          SHEETS_CREDENTIALS_PRIVATE_KEY_ID: '{{resolve:ssm:/google/sheets/credentials/mine_your_business/private_key_id:1}}' 
+          SHEETS_CREDENTIALS_PRIVATE_KEY: '{{resolve:ssm:/google/sheets/credentials/mine_your_business/private_key:1}}' 
+          SHEETS_CREDENTIALS_CLIENT_EMAIL: '{{resolve:ssm:/google/sheets/credentials/mine_your_business/client_email:1}}' 
+          SHEETS_CREDENTIALS_CLIENT_ID: '{{resolve:ssm:/google/sheets/credentials/mine_your_business/client_id:1}}' 
+          # SHEETS_CREDENTIALS_AUTH_URI: https://accounts.google.com/o/oauth2/auth
+          SHEETS_CREDENTILS_TOKEN_URI: https://oauth2.googleapis.com/token
+          SHEETS_CREDENTIALS_AUTH_PROVIDER_X509_CERT_URL: https://www.googleapis.com/oauth2/v1/certs
+          SHEETS_CREDENTIALS_CLIENT_X509_CERT_URL: '{{resolve:ssm:/google/sheets/credentials/mine_your_business/client_x509_cert_url:1}}' 
+
       Events:
         CWSchedule:
           Type: Schedule

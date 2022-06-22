@@ -5,6 +5,7 @@ from .configuration import Configuration
 from uniswap import Uniswap
 from web3 import Web3
 from web3.middleware import geth_poa_middleware
+from .recorder import Recorder
 
 
 def lambda_handler(event, context):
@@ -96,17 +97,38 @@ def lambda_handler(event, context):
 
     if dry_run:
         print(f'This was a dry run; Would have made trade of {token_bal} {inp_symbol} for {trade_value} {out_symbol}')
+        # To allow record functionality to be leveraged during a dry run, write a fake transaction ID
+        transaction_id = "fakeTx"
+    else:
+        print(f'Submitting trade transaction of {token_bal} {inp_symbol} for {trade_value} {out_symbol}')
+        result = uniswap.make_trade(
+            inp_currency_addr,
+            out_currency_addr,
+            token_bal_raw,
+            recipient=config.withdrawals.wallet_address,
+            fee=fee_pool_val
+        )
+        transaction_id = result.hex()
+        print(f'Trade issued: {transaction_id}')
+
+    if config.sheets is None:
+        print('Trade will not be recorded')
         return
 
-    print(f'Submitting trade transaction of {token_bal} {inp_symbol} for {trade_value} {out_symbol}')
-    result = uniswap.make_trade(
-        inp_currency_addr,
-        out_currency_addr,
-        token_bal_raw,
-        recipient=config.withdrawals.wallet_address,
-        fee=fee_pool_val
+    print('Trade will be recorded')
+    recorder = Recorder(config.sheets)
+    recorder.record(
+        exchange=config.uniswap.exchange,
+        network=config.uniswap.network,
+        input_symbol=inp_symbol,
+        output_symbol=out_symbol,
+        price=price,
+        price_impact=expected_real_impact,
+        input_amount=token_bal,
+        output_amount=trade_value,
+        transaction_id=transaction_id,
+        transactions_explorer_prefix=config.uniswap.transactions_explorer_prefix
     )
-    print(f'Trade issued: {result.hex()}')
 
     # We got here successfully!
     return True
