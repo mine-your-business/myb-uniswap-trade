@@ -100,6 +100,10 @@ def lambda_handler(event, context):
         # To allow record functionality to be leveraged during a dry run, write a fake transaction ID
         transaction_id = "fakeTx"
     else:
+        if trade_value < 5.00:
+            print(f'Trade value insufficient: {trade_value} < 5.00 - will not submit a trade')
+            return True
+
         print(f'Submitting trade transaction of {token_bal} {inp_symbol} for {trade_value} {out_symbol}')
         result = uniswap.make_trade(
             inp_currency_addr,
